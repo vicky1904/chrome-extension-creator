@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Shield, Sparkles, Type, Eye, Plus, X, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Shield, Sparkles, Type, Eye, Plus, X, Trash2, Sun, Moon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,18 @@ const BlurExtensionPopup = () => {
   const [blurIntensity, setBlurIntensity] = useState([70]);
   const [keywords, setKeywords] = useState<string[]>(["SSN", "credit card", "password"]);
   const [newKeyword, setNewKeyword] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains("dark");
+    setIsDarkMode(isDark);
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    document.documentElement.classList.toggle("dark", newMode);
+  };
 
   // Mock stats
   const stats = {
@@ -40,14 +52,24 @@ const BlurExtensionPopup = () => {
     <div className="w-[360px] bg-background rounded-2xl shadow-2xl overflow-hidden border border-border/50">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary via-accent to-secondary p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-            <Shield className="w-6 h-6 text-white" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">PII Shield</h1>
+              <p className="text-xs text-white/80">Protect your sensitive data</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-white">PII Shield</h1>
-            <p className="text-xs text-white/80">Protect your sensitive data</p>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleDarkMode}
+            className="w-9 h-9 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-white"
+          >
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </Button>
         </div>
       </div>
 
