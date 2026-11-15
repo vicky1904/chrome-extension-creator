@@ -1,73 +1,51 @@
-# Welcome to your Lovable project
+# Photos Storage Cleaner
 
-## Project info
+A Chrome extension that frees Google storage without a subscription. It finds
+duplicate and similar Google Photos with on-device AI, moves them to Google
+Photos Trash after you review them, and later can offload old items to your
+own drive.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Photos never leave your computer. Hashing and the similarity model run
+locally in an offscreen document. The only network traffic is to Google
+Photos itself and a one-time model download from the Hugging Face Hub.
 
-## How can I edit this code?
+Read [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) before
+changing code. It records the decisions, what is built, what is unverified,
+and the milestones.
 
-There are several ways of editing your application.
+## Quick start
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+npm install
+npm test
+npm run build:mock   # fixture library, no Google account needed
 ```
 
-**Edit a file directly in GitHub**
+Open chrome://extensions, enable Developer mode, choose "Load unpacked" and
+select `dist/`. Click the toolbar icon and run a scan.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+`npm run build` produces the real build that talks to photos.google.com.
+Use a dedicated test Google account until Milestone 0 is complete.
 
-**Use GitHub Codespaces**
+## Layout
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+src/adapter/      all Google Photos knowledge, plus a mock adapter
+src/config/       remotely refreshable RPC ids and response paths
+src/background/   service worker: jobs, badge, alarms
+src/content/      thin relay running in the photos.google.com tab
+src/offscreen/    thumbnail decoding, hashing, model inference
+src/ml/           perceptual hashes, clustering, best-shot scoring, models
+src/storage/      IndexedDB schema and repository
+src/ui/           popup and review dashboard
+spikes/           Milestone 0 probe to run on the test account
+tests/            unit and pipeline tests (vitest, fake-indexeddb)
+```
 
-## What technologies are used for this project?
+## Safety defaults
 
-This project is built with:
+Dry run is on by default. Items only ever go to Google Photos Trash.
+Favourites are never touched. A group is never emptied. Items that do not
+count against your quota are never counted as reclaimable.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+See [NOTICE.md](NOTICE.md) for third-party credits and model licences.
